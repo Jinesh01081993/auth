@@ -43,7 +43,7 @@ jobs:
       - name: Push Docker Images
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Verify Image
         run: |
