@@ -35,21 +35,11 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY:$SHORT_SHA .
 
-      - name: Tag Docker Image
-        run: |
-          docker tag $ECR_REPOSITORY:$SHORT_SHA \
-            $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA
-
-          docker tag $ECR_REPOSITORY:$SHORT_SHA \
-            $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
       - name: Push Docker Images
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Verify Image
         run: |
           echo "Successfully pushed:"
           echo "$ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA"
-          echo "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
