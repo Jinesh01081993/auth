@@ -6,15 +6,16 @@ on:
       - main
 
 env:
+  AWS_REGION: ap-south-1
   ECR_REPOSITORY: auth
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REGISTRY: 137307166466.dkr.ecr.ap-south-1.amazonaws.com
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
@@ -25,22 +26,27 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, Tag and Push Image
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Build Docker Image
         run: |
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
 
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG \
-            $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Tag Docker Image
+        run: |
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+          $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
 
-          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+          $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-          docker tag $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            $REGISTRY/$ECR_REPOSITORY:latest
+      - name: Push Docker Images
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-          docker push $REGISTRY/$ECR_REPOSITORY:latest
+      - name: Verify Image
+        run: |
+          echo "Successfully pushed:"
+          echo "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+          echo "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
