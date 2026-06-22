@@ -10,15 +10,6 @@ env:
   ECR_REPOSITORY: auth
   ECR_REGISTRY: 137307166466.dkr.ecr.ap-south-1.amazonaws.com
 
-  PORT: 4001
-  JWT_SECRET: health-check-app
-  DB_HOST: postgresql.postgresql
-  DB_PORT: 5432
-  DB_NAME: microservice_auth
-  DB_USER: postgres
-  DB_PASSWORD: postgres
-  DB_POOL_MAX: 10
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -26,22 +17,6 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
-
-      - name: Create .env file
-        run: |
-          cat > .env << EOF
-          PORT=${PORT}
-          JWT_SECRET=${JWT_SECRET}
-          DB_HOST=${DB_HOST}
-          DB_PORT=${DB_PORT}
-          DB_NAME=${DB_NAME}
-          DB_USER=${DB_USER}
-          DB_PASSWORD=${DB_PASSWORD}
-          DB_POOL_MAX=${DB_POOL_MAX}
-          EOF
-
-      - name: Verify .env
-        run: cat .env
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
