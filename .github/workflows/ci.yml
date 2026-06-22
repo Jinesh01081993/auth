@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone Repository
+      - name: Checkout Source
         uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
@@ -24,26 +24,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to ECR
+      - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker Image
-        run: docker build -t auth:${{ github.sha }} .
-
-      - name: Tag Docker Image
+      - name: Build, Tag and Push Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker tag auth:${{ github.sha }} \
-          ${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }}
+          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
 
-      - name: Push Docker Image
-        run: |
-          docker push \
-          ${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }}
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG \
+            $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-          docker tag \
-          ${{ steps.login-ecr.outputs.registry }}/auth:${{ github.sha }} \
-          ${{ steps.login-ecr.outputs.registry }}/auth:latest
+          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-          docker push \
-          ${{ steps.login-ecr.outputs.registry }}/auth:latest
+          docker tag $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            $REGISTRY/$ECR_REPOSITORY:latest
+
+          docker push $REGISTRY/$ECR_REPOSITORY:latest
