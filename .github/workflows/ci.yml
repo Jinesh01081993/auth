@@ -33,9 +33,9 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t $ECR_REPOSITORY:$SHORT_SHA .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA .
 
-      - name: Push Docker Images
+      - name: Push Docker Image
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$SHORT_SHA
 
