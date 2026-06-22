@@ -6,9 +6,9 @@ on:
       - main
 
 env:
-  AWS_REGION: ap-south-1
-  ECR_REPOSITORY: auth
-  ECR_REGISTRY: 137307166466.dkr.ecr.ap-south-1.amazonaws.com
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
 
 jobs:
   build-and-push:
